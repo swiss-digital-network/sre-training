@@ -32,6 +32,13 @@ spec:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
         imagePullPolicy: ""
         name: es
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
         ports:
         - containerPort: 9200
         resources: {}
@@ -76,6 +83,13 @@ spec:
         command: [ "/bin/sh", "-c", "ls /mnt/locust", "-f locustfile.py --headless -H http://localhost:5000 -u 10 -r 1"]
         imagePullPolicy: ""
         name: locust
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
         ports:
         - containerPort: 8089
         resources: {}
@@ -171,6 +185,13 @@ spec:
         image: daz2.jfrog.io/daz-srelabs/foodtruck-web:1.0.0
         imagePullPolicy: Always
         name: foodtruck
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
         ports:
         - containerPort: 5000
         resources: {}
