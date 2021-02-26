@@ -12,9 +12,7 @@ spec:
         app: web
     spec:
       containers:
-      - args:
-        - sfx-py-trace
-        - app.py
+      - args: ["splk-py-trace", "python3", "app.py"]
         env:
         - name: DEBUG
           value: "True"
@@ -22,14 +20,14 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: SIGNALFX_SERVICE_NAME
+        - name: SPLK_SERVICE_NAME
           value: "$(NAMESPACE_NAME)-FoodTruck"
         - name: SIGNALFX_AGENT_HOST
           valueFrom:
             fieldRef:
               apiVersion: v1
               fieldPath: status.hostIP
-        - name: SIGNALFX_ENDPOINT_URL
+        - name: SPLK_TRACE_EXPORTER_URL
           value: http://$(SIGNALFX_AGENT_HOST):9080/v1/trace
         image: daz2.jfrog.io/daz-srelabs/foodtruck-web:1.0.0
         imagePullPolicy: Always
