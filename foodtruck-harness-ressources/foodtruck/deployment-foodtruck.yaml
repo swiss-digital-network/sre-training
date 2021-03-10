@@ -39,7 +39,7 @@ spec:
               fieldPath: status.hostIP
         - name: SPLK_TRACE_EXPORTER_URL
           value: http://$(SIGNALFX_AGENT_HOST):9080/v1/trace
-        image: ${artifact.metadata.image}
+        image: {{.Values.image}}
         imagePullPolicy: Always
         name: foodtruck
         resources:
