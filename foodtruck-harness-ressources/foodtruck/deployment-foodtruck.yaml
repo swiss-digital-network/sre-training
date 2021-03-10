@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: foodtruck-dockercfg
+  annotations:
+    harness.io/skip-versioning: "true"
+data:
+  .dockercfg: {{.Values.dockercfg}}
+type: kubernetes.io/dockercfg
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - args: ["splk-py-trace", "python3", "app.py"]
+        env:
+        - name: DEBUG
+          value: "True"
+        - name: NAMESPACE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: SPLK_SERVICE_NAME
+          value: "$(NAMESPACE_NAME)-FoodTruck"
+        - name: SIGNALFX_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: SPLK_TRACE_EXPORTER_URL
+          value: http://$(SIGNALFX_AGENT_HOST):9080/v1/trace
+        image: ${artifact.metadata.image}
+        imagePullPolicy: Always
+        name: foodtruck
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 5000
+      restartPolicy: Always
+      imagePullSecrets:
+      - name: foodtruck-dockercfg
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  type: LoadBalancer
+  ports:
+  - name: web
+    port: 5000
+    targetPort: 5000
+  selector:
+    app: web
