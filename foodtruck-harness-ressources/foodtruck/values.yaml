@@ -1,0 +1,2 @@
+image: ${artifact.metadata.image}
+dockercfg: ${artifact.source.dockerconfig}
