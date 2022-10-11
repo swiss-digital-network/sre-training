@@ -51,7 +51,6 @@ spec:
             cpu: "200m"
         ports:
         - containerPort: 5000
-        resources: {}
       restartPolicy: Always
       imagePullSecrets:
       - name: {{.Values.name}}-dockercfg
