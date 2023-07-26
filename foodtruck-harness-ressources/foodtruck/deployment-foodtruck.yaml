@@ -1,13 +1,16 @@
+{{- if .Values.dockercfg}}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: foodtruck-dockercfg
+  name: {{.Values.name}}-dockercfg
   annotations:
     harness.io/skip-versioning: "true"
 data:
   .dockercfg: {{.Values.dockercfg}}
 type: kubernetes.io/dockercfg
 ---
+{{- end}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,25 +23,22 @@ spec:
     metadata:
       labels:
         app: web
-    spec:
+    spec:  
       containers:
-      - args: ["splk-py-trace", "python3", "app.py"]
+      - args: ["splunk-py-trace", "python3", "app.py"]
         env:
+        - name: SPLUNK_OTEL_AGENT
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://$(SPLUNK_OTEL_AGENT):4317"
+        - name: OTEL_SERVICE_NAME
+          value: "$(NAMESPACE_NAME)-FoodTruck"
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "deployment.environment=prod"
         - name: DEBUG
           value: "True"
-        - name: NAMESPACE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: SPLK_SERVICE_NAME
-          value: "$(NAMESPACE_NAME)-FoodTruck"
-        - name: SIGNALFX_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.hostIP
-        - name: SPLK_TRACE_EXPORTER_URL
-          value: http://$(SIGNALFX_AGENT_HOST):9080/v1/trace
         image: {{.Values.image}}
         imagePullPolicy: Always
         name: foodtruck
@@ -53,7 +53,8 @@ spec:
         - containerPort: 5000
       restartPolicy: Always
       imagePullSecrets:
-      - name: foodtruck-dockercfg
+      - name: {{.Values.name}}-dockercfg
+
 
 ---
 apiVersion: v1
@@ -61,10 +62,10 @@ kind: Service
 metadata:
   name: web
 spec:
-  type: LoadBalancer
   ports:
   - name: web
     port: 5000
     targetPort: 5000
   selector:
     app: web
+  type: LoadBalancer
