@@ -1,1 +1,1 @@
-image: ${artifact.metadata.image}
+image: <+artifacts.primary.image> 
