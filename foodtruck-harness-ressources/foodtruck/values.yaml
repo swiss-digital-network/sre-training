@@ -1,2 +1,1 @@
 image: <+artifacts.primary.image> 
-dockercfg: ${artifact.source.dockerconfig}
