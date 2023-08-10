@@ -23,6 +23,7 @@ spec:
     metadata:
       labels:
         app: web
+        app.kubernetes.io/version: {{.Values.version}}
     spec:  
       containers:
       - args: ["splunk-py-trace", "python3", "app.py"]

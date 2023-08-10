@@ -1,1 +1,2 @@
 image: <+artifacts.primary.image> 
+version: <+artifacts.primary.tag>
