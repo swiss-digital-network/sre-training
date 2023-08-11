@@ -28,6 +28,10 @@ spec:
       containers:
       - args: ["splunk-py-trace", "python3", "app.py"]
         env:
+        - name: NAMESPACE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         - name: SPLUNK_OTEL_AGENT
           valueFrom:
             fieldRef:
@@ -37,7 +41,7 @@ spec:
         - name: OTEL_SERVICE_NAME
           value: "$(NAMESPACE_NAME)-FoodTruck"
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: "deployment.environment=prod"
+          value: "deployment.environment=dev"
         - name: DEBUG
           value: "True"
         image: {{.Values.image}}
