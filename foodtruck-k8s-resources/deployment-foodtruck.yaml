@@ -6,6 +6,7 @@ spec:
   selector:
     matchLabels:
       app: web
+      harness.io/track: stable
   template:
     metadata:
       labels:
